@@ -13,7 +13,7 @@ get_list(Num_Elements, [0|List]) :-
 	Num_Elements2 is Num_Elements-1,
 	get_list(Num_Elements2, List).
 
-%Base case for initializing a list of a given length with random weights
+%Base case for initializing a given length list of random weights
 get_weights(0, []).
 %Operating case
 get_weights(Num_Weights, [Rand_Weight | List]) :-
@@ -27,18 +27,26 @@ get_weights(Num_Weights, [Rand_Weight | List]) :-
 initialize_layers(Layers, [Input_Nodes, Hidden_Nodes, Output_Nodes], Layers_List) :-
 	Hidden_Layers is Layers-2, 
 	get_list(Output_Nodes, Output_List),
+    length(Output_List, OL),
+    get_weights(OL, Output_List2),
 	get_list(Input_Nodes, Input_List),
+    length(Input_List, IL),
+    get_weights(IL, Input_List2),
 	get_list(Hidden_Nodes, Hidden_List),
-	add_list(Hidden_Layers_List, Input_List, Input_Hidden_Layers_List),
-	add_to_end(Input_Hidden_Layers_List, Output_List, Layers_List),
-	get_hidden_layers(Hidden_Layers, Hidden_List, Hidden_Layers_List).
+    length(Hidden_List, HL),
+    get_weights(HL, Hidden_List2),
+	add_list(Hidden_Layers_List, Input_List2, Input_Hidden_Layers_List),
+	add_to_end(Input_Hidden_Layers_List, Output_List2, Layers_List),
+	get_hidden_layers(Hidden_Layers, Hidden_List2, Hidden_Layers_List).
 
 %Add an element to the end of a list
 add_to_end([], H2, [H2]).
 add_to_end([H|T], H2, [H|List]) :-
 	add_to_end(T, H2, List).
+
 %Add a list to another list
 add_list([H|T], H2, [H2,H|T]).
+
 %Add the hidden layers lists together
 get_hidden_layers(0, Hidden_List, []).
 get_hidden_layers(Num_Hidden_Layers, Hidden_List, [Hidden_List | Hidden_Layers]) :- 
