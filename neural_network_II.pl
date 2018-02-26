@@ -72,9 +72,10 @@ network_error(Output,Target,Error) :-
 %Backpropagation to the weights piped to the output
 %Output is the output of the output node, target is the target of the output, previous node output is the output of the hidden layer node whose weight to this output is being updated
 %Weight update is the update to the weight from the hidden layer
-output_update(Output, Target, Previous_Node_Output, Weight_Update) :-
+output_update(Output, Target, Previous_Node_Output, Weight_Update, Delta) :-
   sigmoid_derivative(Output, Derivative),
-  Weight_Update is (Output-Target)*Derivative*Previous_Node_Output. 
+  Delta is (Output-Target)*Derivative,
+  Weight_Update is Delta*Previous_Node_Output. 
 
 %Error due to this node is the sum of all the weight updates from this node
 %to the relevant output node
