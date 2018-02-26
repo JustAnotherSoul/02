@@ -52,9 +52,32 @@ get_hidden_weights(Hidden_Layers, Hidden_Weights, Temp_Weights, Hid_Weights) :-
   add_list(New_Hid_Weights,Temp_Weights, New_Temp_Weights),
   get_hidden_weights(New_Hidden_Layers, Hidden_Weights, New_Temp_Weights, Hid_Weights).
 
+%Add a list to a list of lists, the inputs are: L1, [H|T] and the output. L1 is the list to add and [H|T] is the accumulator
 add_list(L1, [], [L1]).
 add_list(L1, [H|T], [L1,H|T]).
 
-
+%Simply the sigmoid function, this gets the sum of the inputs to a node times their weights
 sigmoid_function(Z, Output) :-
-  Output is 1 rdiv e, format('~50f~n',[Output]).
+  Output is 1/(1+(e^(-1*Z))).
+
+%Taking the derivative of a sigmoid function based on the output of the sigmoid function 
+sigmoid_derivative(Sigmoid, Output) :-
+  Output is Sigmoid * (1 - Sigmoid).
+
+%Back propagation, first we have an error function
+%Output is a list of the output from the output nodes (FOR NOW JUST ONE)
+%Target is a list of the target for the output nodes (FOR NOW JUST ONE)
+network_error(Output,Target,Error) :-
+  Error is (1/2)*(Output - Target)^2.
+%Backpropagation to the weights piped to the output
+%Output is the output of the output node, target is the target of the output, previous node output is the output of the hidden layer node whose weight to this output is being updated
+%Weight update is the update to the weight from the hidden layer
+output_update(Output, Target, Previous_Node_Output, Weight_Update) :-
+  sigmoid_derivative(Output, Derivative),
+  Weight_Update is (Output-Target)*Derivative*Previous_Node_Output. 
+
+%Error due to this node is the sum of all the weight updates from this node
+%to the relevant output node
+hidden_update(Output, Error_Due_To_This_Node, Previous_Node_Output, Weight_Update) :-
+  sigmoid_derivative(Output, Derivative),
+  Weight_Update is Previous_Node_Output*Derivative*(Error_Due_To_This_Node/Output). %Basically: Weight_Update from Output JK is dk*aj so divide by aj (output), to get the sum of the deltas. This doesn't quite work but it's on the right track: Need to pull it out first because it needs to be multiplied by the weight from j to k and then be summed.
