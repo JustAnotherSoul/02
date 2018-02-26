@@ -77,8 +77,10 @@ output_update(Output, Target, Previous_Node_Output, Weight_Update, Delta) :-
   Delta is (Output-Target)*Derivative,
   Weight_Update is Delta*Previous_Node_Output. 
 
-%Error due to this node is the sum of all the weight updates from this node
+%Error due to this node is the sum of all the delta from the output nodes times the weight of this node
 %to the relevant output node
-hidden_update(Output, Error_Due_To_This_Node, Previous_Node_Output, Weight_Update) :-
+hidden_update(Output, Error_Due_To_This_Node, Previous_Node_Output, Weight_Update, Delta) :-
   sigmoid_derivative(Output, Derivative),
-  Weight_Update is Previous_Node_Output*Derivative*(Error_Due_To_This_Node/Output). %Basically: Weight_Update from Output JK is dk*aj so divide by aj (output), to get the sum of the deltas. This doesn't quite work but it's on the right track: Need to pull it out first because it needs to be multiplied by the weight from j to k and then be summed.
+  Delta is Derivative*Error_Due_To_This_Node,
+  Weight_Update is Previous_Node_Output*Derivative*Error_Due_To_This_Node. 
+
